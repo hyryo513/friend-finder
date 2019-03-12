@@ -12,14 +12,14 @@ var dbCollections;
 client.connect(function(err){
     if (err) throw err;
     dbCollections = client.db("heroku_s8wpltzk").collection("friends");
-});
-
-module.exports = function(app){
-app.get("/api/friends", function(req, res) {
     dbCollections.find({}, {projection: { _id: 0, name: 1, photo: 1, scores: 1}}).toArray(function(err, docs) {
         if (err) throw err;
         friends = docs;
     });
+});
+
+module.exports = function(app){
+app.get("/api/friends", function(req, res) {
     return res.json(friends);
   });
   

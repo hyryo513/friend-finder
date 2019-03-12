@@ -1,17 +1,25 @@
-var fs = require("fs");
-var path = require("path");
+require("dotenv").config();
 var foundFriend;
 var friends;
 var difference;
 var differenceArray = [];
+var keys = require("../../keys");
 
-fs.readFile(path.join(__dirname, '/../data/friends.js'), "utf-8", function(err, data){
-    if (err) throw err
-    friends = JSON.parse(data);
-})
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb://" + keys.mongodb.key + "@ds163255.mlab.com:63255/heroku_s8wpltzk";
+const client = new MongoClient(uri, { useNewUrlParser: true });
+var dbCollections;
+client.connect(function(err){
+    if (err) throw err;
+    dbCollections = client.db("heroku_s8wpltzk").collection("friends");
+});
 
 module.exports = function(app){
 app.get("/api/friends", function(req, res) {
+    dbCollections.find({}, {projection: { _id: 0, name: 1, photo: 1, scores: 1}}).toArray(function(err, docs) {
+        if (err) throw err;
+        friends = docs;
+    });
     return res.json(friends);
   });
   
@@ -20,9 +28,8 @@ app.post("/api/friends", function(req, res) {
     differenceArray = [];
     findFriend(req.body.scores);
     friends.push(req.body);
-    fs.writeFile(path.join(__dirname, '/../data/friends.js'), JSON.stringify(friends), "utf-8", function(err){
+    dbCollections.insertOne({name: req.body.name, photo: req.body.photo, scores: req.body.scores}, function(err, docs) {
         if (err) throw err;
-        console.log('The file has been saved!');
     });
     return res.json(foundFriend);
   });

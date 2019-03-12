@@ -1,19 +1,6 @@
-
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://admin:admin@cluster0-vewpz.mongodb.net/test?retryWrites=true";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  //console.log(collection);
-  client.close();
-});
-
-
 // Dependencies
 // =============================================================
 var express = require("express");
-var path = require("path");
 
 // Sets up the Express App
 // =============================================================
